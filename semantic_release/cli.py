@@ -12,7 +12,14 @@ from semantic_release import ci_checks
 from semantic_release.errors import GitError, ImproperConfigurationError
 
 from .changelog import markdown_changelog
-from .dist import build_dists, remove_dists, should_build, should_remove_dist
+from .dist import (
+    build_dists,
+    has_upload_command,
+    remove_dists,
+    should_build,
+    should_remove_dist,
+    upload_dists,
+)
 from .history import (
     evaluate_version_bump,
     get_current_release_version,
@@ -394,7 +401,10 @@ def publish(
                 remove_dists(dist_path)
             build_dists()
 
-        if ArtifactRepo.upload_enabled():
+        if has_upload_command():
+            logger.info("Uploading to artifact Repository using command")
+            upload_dists()
+        elif ArtifactRepo.upload_enabled():
             logger.info("Uploading to artifact Repository")
             ArtifactRepo(Path(dist_path)).upload(
                 noop=noop, verbose=verbose, skip_existing=retry

@@ -19,6 +19,16 @@ def should_build():
     build_command = build_command if build_command != "false" else False
     return bool(build_command and (upload_to_artifact_repository or upload_release))
 
+def has_upload_command() -> bool:
+    """Does the user have an upload command they want to run?"""
+    return bool(config.get("upload_command"))
+
+def upload_dists():
+    """Run an arbitrary build command"""
+    command = config.get("upload_command")
+    logger.info(f"Running {command}")
+    run(command)
+
 
 def should_remove_dist():
     remove_dist = config.get("remove_dist")
